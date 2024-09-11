@@ -8,3 +8,4 @@
 #8 Protecting Routes (Middleware)
 #9 Search Routes - Person
 #10 Search Routes
+#11 Frontend Setup

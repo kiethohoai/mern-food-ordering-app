@@ -6,3 +6,4 @@
 #6 Fetching Movies From API
 #7 Fetchin TV Shows From API
 #8 Protecting Routes (Middleware)
+#9 Search Routes - Person

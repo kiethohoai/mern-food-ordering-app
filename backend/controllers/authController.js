@@ -1,6 +1,7 @@
 import validator from 'validator';
 import bcryptjs from 'bcryptjs';
 import { User } from '../models/userModel.js';
+import { generateTokenAndSetCookie } from '../utils/generateToken.js';
 
 export const signup = async (req, res) => {
   try {
@@ -49,16 +50,19 @@ export const signup = async (req, res) => {
     const PROFILE_PICS = ['/avatar1.png', '/avatar2.png', '/avatar3.png'];
     const image = PROFILE_PICS[Math.floor(Math.random() * PROFILE_PICS.length)];
 
-    const newUser = await User.create({
+    const newUser = await User({
       username,
       email,
       password: hashPassword,
       image,
     });
 
-    // await newUser.save();
-    newUser.password = '';
+    // Get token
+    generateTokenAndSetCookie(newUser._id, res);
+    await newUser.save();
 
+    // Remove password from respone
+    newUser.password = '';
     res.status(201).json({
       success: 'true',
       message: 'User created successfully!',

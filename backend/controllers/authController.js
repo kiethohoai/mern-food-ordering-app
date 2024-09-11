@@ -3,26 +3,27 @@ import bcryptjs from 'bcryptjs';
 import { User } from '../models/userModel.js';
 import { generateTokenAndSetCookie } from '../utils/generateToken.js';
 
+// todo SIGNUP
 export const signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
       return res.status(400).json({
-        success: 'fail',
+        success: 'false',
         message: 'All fields are required!',
       });
     }
 
     if (!validator.isEmail(email)) {
       return res.status(400).json({
-        success: 'fail',
+        success: 'false',
         message: 'Invalid Email!',
       });
     }
 
     if (password.length < 6) {
       res.status(400).json({
-        success: 'fail',
+        success: 'false',
         message: 'Password must be at least 6 characters!',
       });
     }
@@ -30,7 +31,7 @@ export const signup = async (req, res) => {
     const existingUserByEmail = await User.findOne({ email: email });
     if (existingUserByEmail) {
       return res.status(400).json({
-        success: 'fail',
+        success: 'false',
         message: 'Email already exists!',
       });
     }
@@ -38,7 +39,7 @@ export const signup = async (req, res) => {
     const existingUserByUsername = await User.findOne({ username: username });
     if (existingUserByUsername) {
       return res.status(400).json({
-        success: 'fail',
+        success: 'false',
         message: 'Username already exists!',
       });
     }
@@ -73,16 +74,58 @@ export const signup = async (req, res) => {
   } catch (error) {
     console.log('🚀🚀🚀error in signup controller=', error.message);
     res.status(500).json({
-      success: 'fail',
+      success: 'false',
       message: 'Internal server error!',
     });
   }
 };
 
+// todo LOGIN
 export const login = async (req, res) => {
-  res.send('LOGIN ROUTE!');
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({
+        success: 'false',
+        message: 'All fields are required!',
+      });
+    }
+
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({
+        success: 'false',
+        message: 'Invalid credentials!',
+      });
+    }
+
+    const isPasswordCorrect = await bcryptjs.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({
+        success: 'false',
+        message: 'Invalid credentials!',
+      });
+    }
+
+    generateTokenAndSetCookie(user._id, res);
+    res.status(200).json({
+      success: 'true',
+      message: 'Logged in successfuly',
+      user: {
+        ...user._doc,
+        password: '',
+      },
+    });
+  } catch (error) {
+    console.log('🚀🚀🚀Error in login controller =', error.message);
+    res.status(500).json({
+      success: 'false',
+      message: 'Internal server error!',
+    });
+  }
 };
 
+// todo LOGOUT
 export const logout = async (req, res) => {
   try {
     res.clearCookie('jwt-netflix');
@@ -91,9 +134,9 @@ export const logout = async (req, res) => {
       message: 'Logged out successfully!',
     });
   } catch (error) {
-    console.log('🚀🚀error=', error);
+    console.log('🚀🚀🚀Error in logout controller =', error);
     res.status(500).json({
-      success: 'fail',
+      success: 'false',
       message: 'Internal server error!',
     });
   }

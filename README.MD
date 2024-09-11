@@ -7,3 +7,4 @@
 #7 Fetchin TV Shows From API
 #8 Protecting Routes (Middleware)
 #9 Search Routes - Person
+#10 Search Routes

@@ -3,3 +3,4 @@
 #3 Generate JWT
 #4 Logout Logic in Backend
 #5 Login Logic in Backend
+#6 Fetching Movies From API

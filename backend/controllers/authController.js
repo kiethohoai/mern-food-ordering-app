@@ -9,21 +9,21 @@ export const signup = async (req, res) => {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
       return res.status(400).json({
-        success: 'false',
+        success: false,
         message: 'All fields are required!',
       });
     }
 
     if (!validator.isEmail(email)) {
       return res.status(400).json({
-        success: 'false',
+        success: false,
         message: 'Invalid Email!',
       });
     }
 
     if (password.length < 6) {
       res.status(400).json({
-        success: 'false',
+        success: false,
         message: 'Password must be at least 6 characters!',
       });
     }
@@ -31,7 +31,7 @@ export const signup = async (req, res) => {
     const existingUserByEmail = await User.findOne({ email: email });
     if (existingUserByEmail) {
       return res.status(400).json({
-        success: 'false',
+        success: false,
         message: 'Email already exists!',
       });
     }
@@ -39,7 +39,7 @@ export const signup = async (req, res) => {
     const existingUserByUsername = await User.findOne({ username: username });
     if (existingUserByUsername) {
       return res.status(400).json({
-        success: 'false',
+        success: false,
         message: 'Username already exists!',
       });
     }
@@ -65,7 +65,7 @@ export const signup = async (req, res) => {
     // Remove password from respone
     newUser.password = '';
     res.status(201).json({
-      success: 'true',
+      success: true,
       message: 'User created successfully!',
       data: {
         user: newUser,
@@ -74,7 +74,7 @@ export const signup = async (req, res) => {
   } catch (error) {
     console.log('🚀🚀🚀error in signup controller=', error.message);
     res.status(500).json({
-      success: 'false',
+      success: false,
       message: 'Internal server error!',
     });
   }
@@ -86,7 +86,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({
-        success: 'false',
+        success: false,
         message: 'All fields are required!',
       });
     }
@@ -94,7 +94,7 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(404).json({
-        success: 'false',
+        success: false,
         message: 'Invalid credentials!',
       });
     }
@@ -102,14 +102,14 @@ export const login = async (req, res) => {
     const isPasswordCorrect = await bcryptjs.compare(password, user.password);
     if (!isPasswordCorrect) {
       return res.status(400).json({
-        success: 'false',
+        success: false,
         message: 'Invalid credentials!',
       });
     }
 
     generateTokenAndSetCookie(user._id, res);
     res.status(200).json({
-      success: 'true',
+      success: true,
       message: 'Logged in successfuly',
       user: {
         ...user._doc,
@@ -119,7 +119,7 @@ export const login = async (req, res) => {
   } catch (error) {
     console.log('🚀🚀🚀Error in login controller =', error.message);
     res.status(500).json({
-      success: 'false',
+      success: false,
       message: 'Internal server error!',
     });
   }
@@ -130,13 +130,13 @@ export const logout = async (req, res) => {
   try {
     res.clearCookie('jwt-netflix');
     res.status(200).json({
-      success: 'true',
+      success: true,
       message: 'Logged out successfully!',
     });
   } catch (error) {
     console.log('🚀🚀🚀Error in logout controller =', error);
     res.status(500).json({
-      success: 'false',
+      success: false,
       message: 'Internal server error!',
     });
   }
